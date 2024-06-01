@@ -1,8 +1,9 @@
 #! /usr/bin/env python3
 
-'''
+"""
 BSD 3-Clause License
 
+Copyright (c) 2024, Xiaofei Carl Zang, Mingfu Shao, and The Pennsylvania State University
 Copyright (c) 2024, Element Biosciences 
 
 Redistribution and use in source and binary forms, with or without
@@ -29,7 +30,7 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-'''
+"""
 
 import os
 import shutil
@@ -230,46 +231,46 @@ def trim_contig(contig, term_len, r1_frag, pcr_primer_list):
                 index = three_term_seq.find(r1_frag_rc)
                 if index != -1:
                     three_term_seq = three_term_seq[:index]
-
+    # do not process pcr primer removal
     # Check for last 9 bases of the PCR primer from config in 5' terminal
-    pcr_primer = ''
-    pcr_primer_rc = ''
-    if len(pcr_primer_list) == 1:
-        pcr_primer = pcr_primer_list[0]
-        pcr_primer_rc = revcomp(pcr_primer_list[0])
-    else:
-        pcr_primer = pcr_primer_list[1]
-        pcr_primer_rc = revcomp(pcr_primer_list[0])
+    # pcr_primer = ''
+    # pcr_primer_rc = ''
+    # if len(pcr_primer_list) == 1:
+    #     pcr_primer = pcr_primer_list[0]
+    #     pcr_primer_rc = revcomp(pcr_primer_list[0])
+    # else:
+    #     pcr_primer = pcr_primer_list[1]
+    #     pcr_primer_rc = revcomp(pcr_primer_list[0])
 
-    pcr_frag = pcr_primer[-7:]
-    index = five_term_seq.find(pcr_frag)
-    if index != -1:
-        five_term_seq = five_term_seq[index + len(pcr_frag):]
-    else:
-        # If not present, check for the pcr_frag_rc in the 3' terminal and trim it
-        pcr_frag_rc = revcomp(pcr_frag)
-        index = three_term_seq.find(pcr_frag_rc)
-        if index != -1:
-            three_term_seq = three_term_seq[:index]
-        else:
-            # check for reverse orientation
-            index = three_term_seq.find(pcr_frag)
-            if index != -1:
-                # if present, extend the match for as long as we can until hitting a mismatch.
-                trim_len = len(pcr_frag)
-                while three_term_seq[index - 1:].startswith(pcr_primer[-trim_len - 1:]) and trim_len < len(pcr_primer):
-                    index -= 1
-                    trim_len += 1
-                # print('found fragment {} at index {}'.format(pcr_primer[-trim_len:], index))
-                three_term_seq = three_term_seq[:index]
-            else:
-                index = five_term_seq.find(pcr_frag_rc)
-                if index != -1:
-                    trim_len = len(pcr_frag_rc)
-                    while five_term_seq[:index + trim_len + 1].endswith(pcr_primer_rc[:trim_len + 1]) and trim_len < len(pcr_primer_rc):
-                        trim_len += 1
-                    # print('found fragment {} at index {}'.format(pcr_primer_rc[:trim_len], index))
-                    five_term_seq = five_term_seq[index + trim_len:]
+    # pcr_frag = pcr_primer[-7:]
+    # index = five_term_seq.find(pcr_frag)
+    # if index != -1:
+    #     five_term_seq = five_term_seq[index + len(pcr_frag):]
+    # else:
+    #     # If not present, check for the pcr_frag_rc in the 3' terminal and trim it
+    #     pcr_frag_rc = revcomp(pcr_frag)
+    #     index = three_term_seq.find(pcr_frag_rc)
+    #     if index != -1:
+    #         three_term_seq = three_term_seq[:index]
+    #     else:
+    #         # check for reverse orientation
+    #         index = three_term_seq.find(pcr_frag)
+    #         if index != -1:
+    #             # if present, extend the match for as long as we can until hitting a mismatch.
+    #             trim_len = len(pcr_frag)
+    #             while three_term_seq[index - 1:].startswith(pcr_primer[-trim_len - 1:]) and trim_len < len(pcr_primer):
+    #                 index -= 1
+    #                 trim_len += 1
+    #             # print('found fragment {} at index {}'.format(pcr_primer[-trim_len:], index))
+    #             three_term_seq = three_term_seq[:index]
+    #         else:
+    #             index = five_term_seq.find(pcr_frag_rc)
+    #             if index != -1:
+    #                 trim_len = len(pcr_frag_rc)
+    #                 while five_term_seq[:index + trim_len + 1].endswith(pcr_primer_rc[:trim_len + 1]) and trim_len < len(pcr_primer_rc):
+    #                     trim_len += 1
+    #                 # print('found fragment {} at index {}'.format(pcr_primer_rc[:trim_len], index))
+    #                 five_term_seq = five_term_seq[index + trim_len:]
 
     contig_trimmed = five_term_seq + middle_seq + three_term_seq
     len_5prime_trimmed = len_original_5prime - len(five_term_seq)
@@ -355,9 +356,15 @@ def read_fastq(input_file):
         lines.append(line.rstrip())
 
     result = []
-    for idx in range(int(len(lines)/4)):
-        result.append((lines[4*idx], lines[4*idx + 1], lines[4*idx + 2], lines[4*idx + 3]))
-
+    if(input_file.endswith(".fq") or 
+       input_file.endswith(".fq.gz") or 
+       input_file.endswith(".fastq") or
+       input_file.endswith(".fastq.gz")):
+        for idx in range(int(len(lines)/4)):
+            result.append((lines[4*idx], lines[4*idx + 1], lines[4*idx + 2], lines[4*idx + 3]))
+    else:
+        for idx in range(int(len(lines)/4)):
+            result.append((lines[2*idx], lines[2*idx + 1]))
     return result
 
 def write_fastq(entries, output_file):
@@ -382,20 +389,48 @@ def sample_fastq(input_file_forward, input_file_reverse, sampling_target, output
 
 def do_assembly_iteration(forward_fq, reverse_fq, threads, sampling_target, pcr_primer, r1_orientation):
     if sampling_target is not None:
-        forward_fq, reverse_fq = sample_fastq(forward_fq, reverse_fq, sampling_target, f"spades_output/forward.fq", f"spades_output/reverse.fq")
+        if(forward_fq.endswith(".fq") or 
+            forward_fq.endswith(".fq.gz") or 
+            forward_fq.endswith(".fastq") or
+            forward_fq.endswith(".fastq.gz")):
+            forward_fq, reverse_fq = sample_fastq(forward_fq, reverse_fq, sampling_target, f"spades_output/forward.fq", f"spades_output/reverse.fq")
+        else:
+            forward_fq, reverse_fq = sample_fastq(forward_fq, reverse_fq, sampling_target, f"spades_output/forward.fa", f"spades_output/reverse.fa")
 
     #
     # run assembly with spades
     #
-    command = f"spades.py -k 21,33,55,77,99,127 -t {threads} --careful --sc -o spades_output --phred-offset 33 --disable-gzip-output -1 {forward_fq} -2 {reverse_fq}"
+    if (args.algorithm == 'spades'):
+        command = f"spades.py -k 21,33,55,77,99,127 -t {threads} --sc -o spades_output --disable-gzip-output -1 {forward_fq} -2 {reverse_fq} "    
+        output_contig_file = 'spades_output/contigs.fasta'
+    elif (args.algorithm == 'megahit'):
+        command = f"megahit -1 {forward_fq} -2 {reverse_fq} -o megahitOut "
+        output_contig_file = 'megahitOut/final.contigs.fa'
+    else:
+        raise RuntimeError(str('unknown algorithm {} got.'.format(args.algorithm)) + str(r'Must be one of ["spades", "megahit"]'))
+    
+    if not os.path.exists("spades_output"):
+        os.makedirs("spades_output")
+
+    if(forward_fq.endswith(".fq") or 
+       forward_fq.endswith(".fq.gz") or 
+       forward_fq.endswith(".fastq") or
+       forward_fq.endswith(".fastq.gz")):
+        if (args.algorithm == 'spades'):
+            command = command + " --careful"
+            command = command + " --phred-offset  33"
+    else:
+        if (args.algorithm == 'spades'):
+            command = command + " --only-assembler"
+    print('command is ', command)
     retcode = os.system(command) 
 
     #
     # read and trim entries
     #
     trimmed_contigs = []
-    if retcode == 0 and os.path.isfile("spades_output/contigs.fasta"):
-        for current_contig in read_fasta("spades_output/contigs.fasta"):
+    if retcode == 0 and os.path.isfile(output_contig_file):
+        for current_contig in read_fasta(output_contig_file):
             current_contig, _, _ = trim_contig(current_contig, 40, "CCTACAC", pcr_primer)
             trimmed_contigs.append(current_contig)
     
@@ -406,6 +441,7 @@ def do_assembly_iteration(forward_fq, reverse_fq, threads, sampling_target, pcr_
                 trimmed_contigs = list([revcomp(trimmed_contig) for trimmed_contig in trimmed_contigs])
 
     shutil.rmtree("spades_output", ignore_errors=True)
+    shutil.rmtree("megahitOut", ignore_errors=True)
     return trimmed_contigs
 
 def create_solo_barcodes_dict(solo_barcodes, solo_contig_barcodes):
@@ -420,9 +456,19 @@ def spades_assembly(input_dir, output_prefix, pcr_primer, anchor_start, anchor_e
     solo_barcodes_dict = create_solo_barcodes_dict(solo_barcodes, solo_contig_barcodes)    
     with open(f"{output_prefix}_output.fa", "w") as output_handle, open(f"{output_prefix}_output.csv", "w") as csv_handle:
         for candidate_file in os.listdir(input_dir):
-            if candidate_file.endswith("_R1.fastq"):
+            #if candidate_file.endswith("_R1.fastq"): 
+            if candidate_file.endswith("1.fastq") or candidate_file.endswith("1.fasta"):
+
                 forward_fq = candidate_file
-                reverse_fq = candidate_file.replace("_R1.fastq", "_R2.fastq")
+                #reverse_fq = candidate_file.replace("_R1.fastq", "_R2.fastq")
+                reverse_fq = ""
+                if candidate_file.endswith("1.fastq"):
+                    reverse_fq = candidate_file.replace("1.fastq", "2.fastq")
+                elif candidate_file.endswith("1.fasta"):
+                    reverse_fq = candidate_file.replace("1.fasta", "2.fasta")
+                else:
+                    raise RuntimeError('file name incorrect, check paired reads')
+
                 umi = candidate_file.split("_")[0]
 
                 if len(solo_barcodes) > 0:
@@ -450,7 +496,7 @@ def spades_assembly(input_dir, output_prefix, pcr_primer, anchor_start, anchor_e
                         else:
                             contigs.append(contig)
                             contig_counts[contig] = 1
-                contigs.sort(key = lambda x: -contig_counts[x])
+                contigs.sort(key = lambda x: (-contig_counts[x], -len(x)))
 
                 #
                 # Find the most frequent Full-length contig
@@ -492,9 +538,12 @@ if __name__ == "__main__":
     parser.add_argument("--solo-contig-barcodes", dest="solo_contig_barcodes", default="", help="Comma-delimited list of contig barcodes (for Solo)")
     parser.add_argument("--solo-barcodes", dest="solo_barcodes", default="", help="Comma-delimited list of Solo barcodes")
     parser.add_argument("--r1-orientation", dest="r1_orientation", default = R1_ORIENTATION_UNKNOWN, help="Orientation of R1 short reads (if known), relative to long read (FORWARD, REVERSE, or UNKNOWN)")
+    parser.add_argument("--algorithm", dest="algorithm", default = 'spades', help=r'which assembly algorithm to use, one of ["spades","megahit"]')
     parser.add_argument("input_dir")
     parser.add_argument("output_prefix")
 
     args = parser.parse_args()
+    if(args.algorithm not in ["spades","megahit"]):
+        raise RuntimeError(str('unknown algorithm {} got.'.format(args.algorithm)) + str(r'Must be one of ["spades","megahit"]'))
 
     spades_assembly(args.input_dir, args.output_prefix, args.pcr_primer, args.anchor_start, args.anchor_end, args.threads, args.assembly_iterations, args.sampling_target, args.solo_barcodes, args.solo_contig_barcodes, args.r1_orientation)
