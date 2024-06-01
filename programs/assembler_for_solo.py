@@ -483,7 +483,7 @@ def spades_assembly(input_dir, output_prefix, pcr_primer, anchor_start, anchor_e
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser("Assemble LoopSeq UMI fragments with Spades")
-    parser.add_argument("--pcr-primer", dest="pcr_primer", required=True, help="Nucleotide sequence of PCR primer")
+    parser.add_argument("--pcr-primer", dest="pcr_primer", default="", help="Nucleotide sequence of PCR primer")
     parser.add_argument("--anchor-start", dest="anchor_start", required=True, help="Expected start sequence of long read")
     parser.add_argument("--anchor-end", dest="anchor_end", required=True, help="Expected end sequence of long read")
     parser.add_argument("--threads", type = int, dest="threads", default = 1, help="Number of threads")
