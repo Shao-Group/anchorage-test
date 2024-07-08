@@ -1,5 +1,5 @@
 # Anchorage-test
-This is the test repo for [anchorage](https://github.com/Shao-Group/anchorage) assembly method. All evaluations were performed on an intel iMac (2019 model).
+This is the test repo for [anchorage](https://github.com/Shao-Group/anchorage) assembly method. All evaluations were performed on an intel iMac.
 
 # Packages and Experiments
 Our experiments involve those tools. 
