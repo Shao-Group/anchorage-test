@@ -6,7 +6,7 @@ Our experiments involve those tools.
 
 | Tool      | Version | Description                                   | Reference                                                    |
 | --------- | ------- | --------------------------------------------- | ------------------------------------------------------------ |
-| Anchorage |         | Assembly tool                                 | [[github]](https://github.com/Shao-Group/anchorage)          |
+| Anchorage |         | Assembly tool                                 | [[github]](https://github.com/Shao-Group/anchorage) [[publication]](https://doi.org/10.4230/LIPIcs.WABI.2024.22) |
 | SPAdes    | v3.15.5 | Assembly tool                                 | [[github]](https://github.com/ablab/spades) [[publication]](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3342519/) |
 | MEGAHIT   | v1.2.9  | Assembly tool                                 | [[github]](https://github.com/voutcn/megahit) [[publication]](https://academic.oup.com/bioinformatics/article/31/10/1674/177884) |
 | Polyester | 1.38.0  | Read simulator                                | [[github]](https://github.com/alyssafrazee/polyester) [[publication]](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4635655/) |
